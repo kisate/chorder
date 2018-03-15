@@ -7,7 +7,7 @@ import pickle
 import librosa
 import librosa.display
 # 1. Get the file path to the included audio example
-filename = "japan.wav"
+filename = "bday.mp3"
 
 # 2. Load the audio as a waveform `y`
 #    Store the sampling rate as `sr`
@@ -19,7 +19,7 @@ tempo = librosa.beat.tempo(y, sr)
 
 print(tempo)
 
-y_harm = librosa.effects.harmonic(y=y, margin=8)
+y_harm = librosa.effects.harmonic(y=y, margin=12)
 print(len(y_harm))
 chroma_os_harm = librosa.feature.chroma_cqt(y=y_harm, sr=sr, bins_per_octave=12*3)
 

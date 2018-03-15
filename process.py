@@ -50,13 +50,13 @@ for j in range(l):
     #s[j] = o.index(max(o))
 
 i = 0
-while(i < (l-t*2)) :
+while(i < (l-len(s)//(2*t))) :
     o = [0]*len(chords)
     g = i
-    for i in range(g, min(int(g+t*2), l)) :
+    for i in range(g, min(int(g+len(s)//(2*t)), l)) :
         o[s2[i]]+=1
     m = o.index(max(o))
-    for g in range(g, min(int(g+t*2), l)) :
+    for g in range(g, min(int(g+len(s)//(2*t)), l)) :
         s2[g] = m
 
             
