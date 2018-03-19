@@ -7,7 +7,7 @@ import pickle
 import librosa
 import librosa.display
 # 1. Get the file path to the included audio example
-filename = "bday.mp3"
+filename = "track2.mp3"
 
 # 2. Load the audio as a waveform `y`
 #    Store the sampling rate as `sr`
@@ -19,14 +19,15 @@ tempo = librosa.beat.tempo(y, sr)
 
 print(tempo)
 
-y_harm = librosa.effects.harmonic(y=y, margin=12)
-print(len(y_harm))
-chroma_os_harm = librosa.feature.chroma_cqt(y=y_harm, sr=sr, bins_per_octave=12*3)
+#y_harm = librosa.effects.harmonic(y=y, margin=12)
+chroma_orig = librosa.feature.chroma_cqt(y=y, sr=sr)
+#print(len(y_harm))
+#chroma_os_harm = librosa.feature.chroma_cqt(y=y_harm, sr=sr, bins_per_octave=12*3)
 
-chroma_filter = np.minimum(chroma_os_harm,
-                           librosa.decompose.nn_filter(chroma_os_harm,
-                                                       aggregate=np.median,
-                                                       metric='cosine'))
+#chroma_filter = np.minimum(chroma_os_harm,
+                           # librosa.decompose.nn_filter(chroma_os_harm,
+                                                       # aggregate=np.median,
+                                                       # metric='cosine'))
 chords = [[1,0,0,0,1,0,0,1,0,0,0,0], #c
           [1,0,0,1,0,0,0,1,0,0,0,0], #cm
           [0,0,1,0,0,0,1,0,0,1,0,0], #d
@@ -44,32 +45,16 @@ chords = [[1,0,0,0,1,0,0,1,0,0,0,0], #c
 names = ['c', 'cm', 'd', 'dm', 'e', 'em', 'f', 'fm', 'g', 'gm', 'a', 'am', 'b', 'bm']
 
 # And for comparison, we'll show the CQT matrix as well.
-C = np.abs(librosa.cqt(y=y, sr=sr, bins_per_octave=12*3, n_bins=7*12*3))
+#C = np.abs(librosa.cqt(y=y, sr=sr, bins_per_octave=12*3, n_bins=7*12*3))
 
-chroma_smooth = scipy.ndimage.median_filter(chroma_filter, size=(1, 9))
+#chroma_smooth = scipy.ndimage.median_filter(chroma_filter, size=(1, 9))
 
-l = len(chroma_smooth[0])
+#l = len(chroma_smooth[0])
 
-print(l)
+#print(l)
 
-chordsToAveragise = 100
-
-s = [0]*(l+chordsToAveragise)
-
-for i in range(l):
-    m = 0
-    chord = 0
-    for k in range(len(chords)):
-        c = 0
-        for n in range(len(chords[0])):
-            c += chroma_smooth[n][i]*chords[k][n]
-        if c > m :
-            m = c
-            chord = k
-    s[i] = chord
-
-f = open('chords.out', 'wb')
-pickle.dump({'chrds' : s, 'samples' : len(y), 'sr' : sr, 'tempo' : tempo}, f)
+f = open('chords2.out', 'wb')
+pickle.dump({'data' : chroma_orig, 'samples' : len(y), 'sr' : sr, 'tempo' : tempo}, f)
 f.close()
 
 import process
