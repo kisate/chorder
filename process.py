@@ -8,6 +8,8 @@ from matplotlib.ticker import FuncFormatter, MaxNLocator, FormatStrFormatter
 import librosa
 import librosa.display
 
+bias = 10
+
 chords = [[1,0,0,0,1,0,0,1,0,0,0,0], #c
           [1,0,0,1,0,0,0,1,0,0,0,0], #cm
           [0,0,1,0,0,0,1,0,0,1,0,0], #d
@@ -60,7 +62,7 @@ def filter1() :
     
 def filter2() :
 
-    s = filter1()
+    s = filter5()
     
     
     print(tempo)
@@ -110,10 +112,61 @@ def filter4() :
             res[i] = chord
     
     return res
-            
-plt.figure(figsize=(12, 9))
 
-plot = plt.subplot(3,1,1)
+
+def filter5() :
+
+    s = [0]*len(data[0])
+    
+    for i in range(len(data[0])):
+        chroma = [0]*12
+        for j in range(12):
+            chroma[j] = data[j][i]
+        deltas = [0]*len(chords)
+        for c in range(len(chords)):
+            deltas[c] = getDelta(chroma, c)
+        s[i] = deltas.index(min(deltas))
+    return s
+        
+
+def getDelta(chroma, index):
+
+    s = 0
+    
+    for i, c in enumerate(chroma) :
+        s += (1-chords[index][i])*(c**2)
+
+    return (s**0.5)/(9*bias)
+    
+tacts = int(samples/sr*tempo/240)
+fpt = int(len(data[0])/tacts)
+fpq = int(fpt*2)        
+def filter6() :
+    s = filter5()
+    
+
+    i = 0
+    while (i < len(s) - fpq) :
+        c = [0]*len(chords)
+        for j in range(i, i + fpq) :
+            c[s[j]]+=1
+        m = c.index(max(c))
+        #print(j)
+        for i in range(i, i + fpq) :
+            s[i] = m
+
+    f = open('aaa.txt', 'w')
+    f.write(str(s))
+    f.close()
+    
+    return s
+
+
+print(int(samples/sr*tempo/240)) 
+            
+plt.figure(figsize=(9, 8))
+
+plot = plt.subplot(4,1,1)
 
 # librosa.display.specshow(data, y_axis='chroma')
 # plt.ylabel('Original')
@@ -128,7 +181,12 @@ def yformat_fn(tick_val, tick_pos):
     else:
         return ''
 def xformat_fn(tick_val, tick_pos):
-    return int(tick_val/(t*2))
+
+    i = 0
+    while(i*fpq <= tick_val) : i+=1
+    i-=1
+    
+    return i
 
 
 plot.yaxis.set_major_formatter(FuncFormatter(yformat_fn))
@@ -136,6 +194,26 @@ plot.yaxis.set_major_locator(MaxNLocator(integer=True))
 
 plt.tight_layout()
 
+
+plot.plot(filter5())
+plt.xlim(xmin=0.0)
+plt.ylim(ymin=0.0)
+
+plt.yticks(range(len(chords)))
+start, end = plot.get_xlim()
+plot.xaxis.set_ticks(np.arange(start, end, t*2))
+plot.xaxis.set_major_formatter(FuncFormatter(xformat_fn))
+plot.grid()
+
+plot = plt.subplot(4,1,2)
+
+#plt.tight_layout()
+
+plt.ylabel('Chords')
+plt.xlabel('Beats')
+
+plot.yaxis.set_major_formatter(FuncFormatter(yformat_fn))
+plot.yaxis.set_major_locator(MaxNLocator(integer=True))
 
 plot.plot(filter2())
 plt.xlim(xmin=0.0)
@@ -147,7 +225,7 @@ plot.xaxis.set_ticks(np.arange(start, end, t*2))
 plot.xaxis.set_major_formatter(FuncFormatter(xformat_fn))
 plot.grid()
 
-plot = plt.subplot(3,1,2)
+plot = plt.subplot(4,1,3)
 
 #plt.tight_layout()
 
@@ -167,9 +245,8 @@ plot.xaxis.set_ticks(np.arange(start, end, t*2))
 plot.xaxis.set_major_formatter(FuncFormatter(xformat_fn))
 plot.grid()
 
-plot = plt.subplot(3,1,3)
+plot = plt.subplot(4,1,4)
 
-#plt.tight_layout()
 
 plt.ylabel('Chords')
 plt.xlabel('Beats')
@@ -177,16 +254,17 @@ plt.xlabel('Beats')
 plot.yaxis.set_major_formatter(FuncFormatter(yformat_fn))
 plot.yaxis.set_major_locator(MaxNLocator(integer=True))
 
-plot.plot(filter4())
+x = filter6()
+
+plot.plot(x)
 plt.xlim(xmin=0.0)
 plt.ylim(ymin=0.0)
 
 plt.yticks(range(len(chords)))
 start, end = plot.get_xlim()
-plot.xaxis.set_ticks(np.arange(start, end, t*2))
+print(len(x))
+print(start, end)
+plot.xaxis.set_ticks(np.arange(0, len(x), fpq))
 plot.xaxis.set_major_formatter(FuncFormatter(xformat_fn))
 plot.grid()
-
-
-
 plt.show()
