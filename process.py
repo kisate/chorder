@@ -12,20 +12,20 @@ chords = [[0]*12]*14
 
 notes = [0, 2, 4, 5, 7, 9, 11]
 
-
+vals = [1, 1, 1]
 
 def generateChords() :
     i = 0
     for n in notes :
         c = [0]*12
-        c[n] = 1
-        c[(n+4)%12] = 1
-        c[(n+7)%12] = 1
+        c[n] = vals[0]
+        c[(n+4)%12] = vals[1]
+        c[(n+7)%12] = vals[2]
         chords[i] = c
         c = [0]*12
-        c[n] = 1
-        c[(n+3)%12] = 1
-        c[(n+7)%12] = 1
+        c[n] = vals[0]
+        c[(n+3)%12] = vals[1]
+        c[(n+7)%12] = vals[2]
         i+=1
         chords[i] = c
         i+=1
@@ -138,7 +138,7 @@ def process(path) :
             deltas = [0]*len(chords)
             for c in range(len(chords)):
                 deltas[c] = getDelta(chroma, c)
-            s[i] = deltas.index(max(deltas))
+            s[i] = deltas.index(min(deltas))
             #print(deltas)
         return s
             
@@ -154,7 +154,7 @@ def process(path) :
         
     tacts = int(samples/sr*tempo/240)
     fpt = int(len(data[0])/tacts)
-    fpq = int(fpt/2)        
+    fpq = int(fpt*2)        
     def filter6() :
         s = filter5()
         
@@ -285,4 +285,4 @@ def process(path) :
     plot.grid()
     plt.show()
 
-process('tsoi2.out')
+process('tsoi1.out')
