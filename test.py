@@ -7,11 +7,11 @@ import pickle
 import librosa
 import librosa.display
 # 1. Get the file path to the included audio example
-filename = "track2.mp3"
-
+filename = "tsoi2"
+savepath = filename + '.out'
 # 2. Load the audio as a waveform `y`
 #    Store the sampling rate as `sr`
-y, sr = librosa.load(filename)
+y, sr = librosa.load(filename + '.mp3')
 
 print(len(y))
 
@@ -19,42 +19,27 @@ tempo = librosa.beat.tempo(y, sr)
 
 print(tempo)
 
-#y_harm = librosa.effects.harmonic(y=y, margin=12)
+y_harm = librosa.effects.harmonic(y=y, margin=12)
 chroma_orig = librosa.feature.chroma_cqt(y=y, sr=sr)
 #print(len(y_harm))
-#chroma_os_harm = librosa.feature.chroma_cqt(y=y_harm, sr=sr, bins_per_octave=12*3)
+chroma_os_harm = librosa.feature.chroma_cqt(y=y_harm, sr=sr, bins_per_octave=12*3)
 
-#chroma_filter = np.minimum(chroma_os_harm,
-                           # librosa.decompose.nn_filter(chroma_os_harm,
-                                                       # aggregate=np.median,
-                                                       # metric='cosine'))
-chords = [[1,0,0,0,1,0,0,1,0,0,0,0], #c
-          [1,0,0,1,0,0,0,1,0,0,0,0], #cm
-          [0,0,1,0,0,0,1,0,0,1,0,0], #d
-          [0,0,1,0,0,1,0,0,0,1,0,0], #dm 
-          [0,0,0,0,1,0,0,0,1,0,0,1], #e
-          [0,0,0,0,1,0,0,1,0,0,0,1], #em
-          [1,0,0,0,0,1,0,0,0,1,0,0], #f
-          [1,0,0,0,0,1,0,0,1,0,0,0], #fm
-          [0,0,1,0,0,0,0,1,0,0,0,1], #g
-          [0,0,1,0,0,0,0,1,0,0,1,0], #gm
-          [1,0,0,0,1,0,0,0,1,0,0,0], #a
-          [1,0,0,0,1,0,0,0,0,1,0,0], #am
-          [0,0,1,0,0,0,1,0,0,0,0,1], #b
-          [0,0,0,1,0,0,1,0,0,0,0,1]] #bm
-names = ['c', 'cm', 'd', 'dm', 'e', 'em', 'f', 'fm', 'g', 'gm', 'a', 'am', 'b', 'bm']
+filtered = librosa.decompose.nn_filter(chroma_os_harm)
 
+chroma_filter = np.minimum(chroma_os_harm, filtered)
 # And for comparison, we'll show the CQT matrix as well.
 #C = np.abs(librosa.cqt(y=y, sr=sr, bins_per_octave=12*3, n_bins=7*12*3))
 
-#chroma_smooth = scipy.ndimage.median_filter(chroma_filter, size=(1, 9))
+chroma_smooth = scipy.ndimage.median_filter(chroma_filter, size=(1, 9))
 
 #l = len(chroma_smooth[0])
 
 #print(l)
 
-f = open('chords2.out', 'wb')
-pickle.dump({'data' : chroma_orig, 'samples' : len(y), 'sr' : sr, 'tempo' : tempo}, f)
+f = open(savepath, 'wb')
+pickle.dump({'data' : chroma_smooth, 'samples' : len(y), 'sr' : sr, 'tempo' : tempo}, f)
 f.close()
 
 import process
+
+process.process(savepath)
