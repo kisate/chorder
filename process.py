@@ -154,7 +154,7 @@ def process(path) :
         
     tacts = int(samples/sr*tempo/240)
     fpt = int(len(data[0])/tacts)
-    fpq = int(fpt*2)        
+    fpq = int(fpt/2)        
     def filter6() :
         s = filter5()
         
@@ -285,4 +285,4 @@ def process(path) :
     plot.grid()
     plt.show()
 
-process('tsoi1.out')
+process('tsoi2.out')
