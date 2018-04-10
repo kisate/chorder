@@ -1,31 +1,20 @@
-import pyaudio
-import wave
-import sys
+import pygame
+import wave 
+pygame.mixer.init(frequency=44100, size=-16, channels=1, buffer=4096)
 
-CHUNK = 1024
+# create a sound from NumPy array of file
+pygame.mixer.music.load('inp.mid')
 
-wf = wave.open('inp.mid', 'rb')
+# open new wave file
+sfile = wave.open('pure_tone.wav', 'w')
 
-# instantiate PyAudio (1)
-p = pyaudio.PyAudio()
+# set the parameters
+sfile.setframerate(44100)
+sfile.setnchannels(1)
+sfile.setsampwidth(2)
 
-# open stream (2)
-stream = p.open(format=p.get_format_from_width(wf.getsampwidth()),
-                channels=wf.getnchannels(),
-                rate=wf.getframerate(),
-                output=True)
+# write raw PyGame sound buffer to wave file
+sfile.writeframesraw(snd.get_buffer().raw)
 
-# read data
-data = wf.readframes(CHUNK)
-
-# play stream (3)
-while len(data) > 0:
-    stream.write(data)
-    data = wf.readframes(CHUNK)
-
-# stop stream (4)
-stream.stop_stream()
-stream.close()
-
-# close PyAudio (5)
-p.terminate()
+# close file
+sfile.close()
