@@ -20,7 +20,7 @@ tempo = librosa.beat.tempo(y, sr)
 print(tempo)
 
 y_harm = librosa.effects.harmonic(y=y, margin=12)
-chroma_orig = librosa.feature.chroma_cqt(y=y, sr=sr)
+chroma_orig = librosa.feature.chroma_cqt(y=y, sr=sr, hop_length=256)
 #print(len(y_harm))
 chroma_os_harm = librosa.feature.chroma_cqt(y=y_harm, sr=sr, bins_per_octave=12*3)
 
@@ -37,7 +37,7 @@ chroma_smooth = scipy.ndimage.median_filter(chroma_filter, size=(1, 9))
 #print(l)
 
 f = open(savepath, 'wb')
-pickle.dump({'data' : chroma_smooth, 'samples' : len(y), 'sr' : sr, 'tempo' : tempo}, f)
+pickle.dump({'data' : chroma_orig, 'samples' : len(y), 'sr' : sr, 'tempo' : tempo}, f)
 f.close()
 
 import process

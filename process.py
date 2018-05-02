@@ -29,7 +29,6 @@ def generateChords() :
         i+=1
         chords[i] = c
         i+=1
-    print(chords)
 
 def process(path) : 
 
@@ -285,4 +284,3 @@ def process(path) :
     plot.grid()
     plt.show()
 
-process('tsoi2.out')
